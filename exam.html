@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam</title>
+    <!-- BS5 -->
+    <link rel="stylesheet" href="/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <!-- NavBar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/index.html">IELTS Band Learner</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/settings.html">Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/exam.html">Exam</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- NavBar -->
+    <div class="container">
+        <div class="container-fluid mx-auto my-5 p-3 border rounded d-flex flex-column gap-3" style="max-width: 500px;"
+            id="exam-skills-picker">
+            <h2 class="text-center">Pick A Skill</h2>
+
+        </div>
+
+        <div class="container-fluid mx-auto my-5 p-3 border rounded d-flex flex-column gap-3 d-none"
+            style="max-width: 500px;" id="exam-question-type-picker">
+            <h2 class="text-center">Pick A Question Type</h2>
+
+        </div>
+
+        <div class="container-fluid mx-auto my-5 p-3 border rounded d-flex flex-column gap-3 d-none"
+            id="exam-form-container">
+            <form id="exam-form">
+                <fieldset id="exam-form-fieldset">
+                    <legend id="exam-form-question">Exam</legend>
+                    <div id="exam-form-answer-inputs" class="mb-3"></div>
+                    <button type="submit" class="btn btn-primary" id="btn-submit" name="btn-submit">
+                        Submit
+                    </button>
+                    <button type="button" name="btn-next" id="btn-next" class="btn btn-info d-none">
+                        Next
+                    </button>
+
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    <script src="/common.js"></script>
+    <script src="/data.js"></script>
+
+    <script>
+        // document.querySelectorAll('button[name="btn-skill-picker"]').forEach((btn) => {
+        //     btn.addEventListener('click', (e) => {
+        //         console.log(e.target.id);
+        //     });
+        // });
+
+        const examSkillPicker = document.getElementById('exam-skills-picker')
+        const examQuestionTypePicker = document.getElementById('exam-question-type-picker')
+        const examFormContainer = document.getElementById('exam-form-container')
+
+        if (examSkillPicker) {
+            exam_types.forEach(type => {
+                const div = document.createElement('div');
+                div.classList.add('d-grid', 'gap-2');
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.name = 'btn-skill-picker';
+                btn.id = `btn-${type}`;
+                btn.classList.add('btn', 'btn-primary');
+                btn.innerText = type;
+                btn.addEventListener('click', (e) => {
+                    // console.log(type);
+                    setExamType(type);
+                    examSkillPicker.classList.add('d-none');
+                    if (examQuestionTypePicker) {
+                        examQuestionTypePicker.classList.remove('d-none');
+                    }
+                });
+                div.appendChild(btn);
+                examSkillPicker.appendChild(div);
+            });
+        }
+
+        if (examQuestionTypePicker) {
+            exam_question_types.forEach(type => {
+                const div = document.createElement('div');
+                div.classList.add('d-grid', 'gap-2');
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.name = 'btn-question-type-picker';
+                btn.id = `btn-${type}`;
+                btn.classList.add('btn', 'btn-primary');
+                btn.innerText = type;
+                btn.addEventListener('click', (e) => {
+                    // console.log(type);
+                    setExamQuestionType(type);
+                    examQuestionTypePicker.classList.add('d-none');
+                    if (examFormContainer) {
+                        examFormContainer.classList.remove('d-none');
+                        generateExamQuestion();
+                    }
+                });
+                div.appendChild(btn);
+                examQuestionTypePicker.appendChild(div);
+            });
+        }
+
+        let questionData = {}
+
+        const constructAnswerCheckbox = (answerText, answer, trueAnswer) => {
+            const container = document.createElement('div')
+            container.classList.add('form-check')
+            const input = document.createElement('input')
+            input.classList.add('form-check-input')
+            input.setAttribute('type', 'checkbox')
+            input.id = answerText
+            // input.setAttribute('data-true-answer', trueAnswer)
+            const label = document.createElement('label')
+            label.classList.add('form-check-label')
+            label.setAttribute('for', answerText)
+            label.setAttribute('data-answer', answer)
+            label.setAttribute('data-true-answer', trueAnswer)
+            label.textContent = answerText
+            container.appendChild(input)
+            container.appendChild(label)
+            return container
+        }
+
+        const constructAnswerRadio = (answer, trueAnswer) => {
+            const container = document.createElement('div')
+            container.classList.add('form-check')
+            const input = document.createElement('input')
+            input.classList.add('form-check-input')
+            input.setAttribute('type', 'radio')
+            input.setAttribute('name', 'answer')
+            input.id = answer
+            // input.setAttribute('data-true-answer', trueAnswer)
+            const label = document.createElement('label')
+            label.classList.add('form-check-label')
+            label.setAttribute('for', answer)
+            label.textContent = answer
+            label.setAttribute('data-answer', answer)
+            label.setAttribute('data-true-answer', trueAnswer)
+            container.appendChild(input)
+            container.appendChild(label)
+            return container
+        }
+
+        const generateExamQuestion = () => {
+            const questionLabel = document.getElementById('exam-form-question')
+            const inputContainer = document.getElementById('exam-form-answer-inputs')
+            inputContainer.innerHTML = ''
+            questionLabel.textContent = ""
+            questionData = generate_random_question()
+            if (questionData.exam_question_type == "Band to Description") {
+                questionLabel.textContent = `Which are the descriptions of ${getExamType()} band ${questionData?.question}?`
+                questionData?.answers.forEach(answer => {
+                    inputContainer.appendChild(constructAnswerCheckbox(answer?.answer, answer?.band, questionData?.question))
+                })
+            } else if (questionData.exam_question_type == "Description to Band") {
+                questionLabel.innerText = `What is the ${getExamType()} band of the description?\n${questionData?.question}`
+                const arrBandOneToNine = Array.from({ length: 9 }, (_, i) => i + 1)
+                arrBandOneToNine.forEach(answer => {
+                    inputContainer.appendChild(constructAnswerRadio(answer, questionData?.question))
+                })
+            }
+        }
+
+        const showAnswer = () => {
+            const exam_question_type = getExamQuestionType()
+            const inputContainer = document.getElementById('exam-form-answer-inputs')
+            const labels = inputContainer.querySelectorAll('label')
+            if (exam_question_type == "Band to Description") {
+                labels.forEach(label => {
+                    if (label.getAttribute('data-answer') === label.getAttribute('data-true-answer')) {
+                        label.classList.add('text-success')
+                        label.textContent = label.textContent + ` => Band ${label.getAttribute('data-answer')}`
+                    } else {
+                        label.classList.add('text-danger')
+                        label.textContent = label.textContent + ` => Band ${label.getAttribute('data-answer')}`
+                    }
+                })
+            } else if (exam_question_type == "Description to Band") {
+                labels.forEach(label => {
+                    if (label.getAttribute('data-answer') === label.getAttribute('data-true-answer')) {
+                        label.classList.add('text-success')
+                    } else {
+                        label.classList.add('text-danger')
+                    }
+                })
+            }
+            // labels.forEach(label => {
+            //     // const input = label.previousElementSibling
+            //     // if (input.checked) {
+            //     if (label.getAttribute('data-answer') === label.getAttribute('data-true-answer')) {
+            //         label.classList.add('text-success')
+            //         label.textContent = label.textContent + " (Correct)"
+            //     } else {
+            //         label.classList.add('text-danger')
+            //     }
+            //     // }
+            // })
+        }
+
+        document.getElementById("btn-submit").addEventListener("click", (event) => {
+            event.preventDefault()
+            showAnswer()
+            document.getElementById("btn-next").classList.remove('d-none')
+            document.getElementById("btn-submit").classList.add('d-none')
+        })
+
+        document.getElementById("btn-next").addEventListener("click", (event) => {
+            event.preventDefault()
+            generateExamQuestion()
+            document.getElementById("btn-next").classList.add('d-none')
+            document.getElementById("btn-submit").classList.remove('d-none')
+        })
+    </script>
+</body>
+
+</html>
