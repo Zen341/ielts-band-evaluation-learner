@@ -67,15 +67,29 @@
         <form id="settings_exam_form" class="mb-3">
             <fieldset id="settings_exam_fieldset">
                 <legend>Exam Settings</legend>
-                <div id="generated-input-container"></div>
+                <div id="generated-input-container">
+
+                </div>
                 <!-- <div class="mb-3">
                     <label for="default-input" class="form-label">Name</label>
                     <input type="number" class="form-control" name="default-input" id="default-input" placeholder="" />
                 </div> -->
             </fieldset>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary me-3">
                 Save
             </button>
+            <div class="btn-group" role="group" id="btn-group-set-all">
+                <button type="button" name="btn-all-0" id="btn-all-0" class="btn btn-danger">
+                    All 0
+                </button>
+                <button type="button" name="btn-all-1" id="btn-all-1" class="btn btn-info">
+                    All 1
+                </button>
+                <button type="button" name="btn-all-10" id="btn-all-10" class="btn btn-success">
+                    All 10
+                </button>
+            </div>
+
         </form>
     </div>
 
@@ -119,22 +133,51 @@
             // the settings is an object with key and value
             // for each key value, generate the inputs
             const fieldset = document.getElementById('generated-input-container')
+
+            // highlight the value
+            const getClassColorString = (value) => {
+                if (value == 0) {
+                    return "text-danger-emphasis"
+                }
+                if (value > 0 && value < 10) {
+                    return "text-info-emphasis"
+                }
+                if (value == 10) {
+                    return "text-success-emphasis"
+                }
+            }
+
             for (const key in settings) {
                 const value = settings[key]
+
                 const div = document.createElement('div')
                 div.classList.add('mb-3')
+
                 const label = document.createElement('label')
                 label.classList.add('form-label')
                 label.setAttribute('for', key)
-                label.textContent = key + " frequency"
+                label.textContent = key + " frequency: "
+
+                const outputSpan = document.createElement("span")
+                outputSpan.textContent = value
+                outputSpan.className = getClassColorString(value)
+                label.appendChild(outputSpan)
+
                 const input = document.createElement('input')
-                input.classList.add('form-control')
-                input.setAttribute('type', 'number')
+                input.classList.add('form-range')
+                input.setAttribute('type', 'range')
                 input.setAttribute('name', key)
                 input.setAttribute('id', key)
                 input.setAttribute('min', 0)
+                input.setAttribute("max", 10)
                 // input.setAttribute('value', value)
                 input.value = value
+
+                input.addEventListener("input", (event) => {
+                    outputSpan.textContent = event.target.value
+                    outputSpan.className = getClassColorString(event.target.value)
+                })
+
                 div.appendChild(label)
                 div.appendChild(input)
                 fieldset.appendChild(div)
@@ -162,6 +205,24 @@
                 alert("Error: " + error?.message)
             }
         })
+
+        const setAllInputValueTo = (value) => {
+            const inputContainer = document.getElementById("generated-input-container")
+            const inputs = inputContainer.getElementsByTagName("input")
+            Array.from(inputs).forEach((input) => {
+                input.value = value
+                const event = new Event('input', { bubbles: true })
+                input.dispatchEvent(event)
+            })
+        }
+
+        const btnGroupSetAll = document.getElementById("btn-group-set-all")
+        const listBtnSetAll = btnGroupSetAll.getElementsByTagName("button")
+        Array.from(listBtnSetAll).forEach((btn) => btn.addEventListener("click", (event) => {
+            const id = btn.id
+            const value = Number(id.replace("btn-all-", ""))
+            setAllInputValueTo(value)
+        }))
 
 
     </script>
