@@ -56,10 +56,10 @@
                     <legend id="exam-form-question">Exam</legend>
                     <div id="exam-form-answer-inputs" class="mb-3"></div>
                     <button type="submit" class="btn btn-primary" id="btn-submit" name="btn-submit">
-                        Submit
+                        Show Answer
                     </button>
                     <button type="button" name="btn-next" id="btn-next" class="btn btn-info d-none">
-                        Next
+                        Next Question
                     </button>
 
                 </fieldset>
@@ -161,7 +161,7 @@
             const label = document.createElement('label')
             label.classList.add('form-check-label')
             label.setAttribute('for', answer)
-            label.textContent = answer
+            label.textContent = `Band ${answer}`
             label.setAttribute('data-answer', answer)
             label.setAttribute('data-true-answer', trueAnswer)
             container.appendChild(input)
@@ -184,7 +184,7 @@
                 questionLabel.innerText = `What is the ${getExamType()} band of the description?\n${questionData?.question}`
                 const arrBandOneToNine = Array.from({ length: 9 }, (_, i) => i + 1)
                 arrBandOneToNine.forEach(answer => {
-                    inputContainer.appendChild(constructAnswerRadio(answer, questionData?.question))
+                    inputContainer.appendChild(constructAnswerRadio(answer, questionData?.answers))
                 })
             }
         }

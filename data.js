@@ -310,12 +310,12 @@ var current_question_freq = {}
 
 var getAQuestionBand = () => {
     // make sure the current question frequency is not empty
-    if (JSON.stringify(current_question_freq) === "{}") {
+    if (JSON.stringify(current_question_freq) == "{}") {
         current_question_freq = getPreferredSetting()
-
+        
         // remove the band that has a value of 0
         for (const key in current_question_freq) {
-            if (current_question_freq[key] === 0) {
+            if (current_question_freq[key] == 0) {
                 delete current_question_freq[key]
             }
         }
