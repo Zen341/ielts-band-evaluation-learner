@@ -306,13 +306,13 @@ var deleteExamQuestionType = () => localStorage.removeItem("exam_question_type")
 deleteExamQuestionType()
 
 
+// used to mirror the settings band freqency to make sure the amount of bands appears as intended randomly
 var current_question_freq = {}
-
 var getAQuestionBand = () => {
     // make sure the current question frequency is not empty
     if (JSON.stringify(current_question_freq) == "{}") {
         current_question_freq = getPreferredSetting()
-        
+
         // remove the band that has a value of 0
         for (const key in current_question_freq) {
             if (current_question_freq[key] == 0) {
@@ -336,6 +336,7 @@ var getAQuestionBand = () => {
     return `${key}`.replace("Band ", "")
 }
 
+// get a random value from the array, the excludeArr is intended to make sure the value does not appear again
 var getRandomValueFromArray = (arr, excludeArr) => {
     let randomIndex = Math.floor(Math.random() * arr.length)
     let result = arr[randomIndex]
@@ -348,8 +349,10 @@ var getRandomValueFromArray = (arr, excludeArr) => {
     return result
 }
 
-var randomIntOneToNine = () => Math.floor(Math.random() * 9) + 1
+// a random value from 1 to 9, with an optional min and max value
+var randomIntOneToNine = (min = 1, max = 9) => Math.floor(Math.random() * (max - min + 1)) + min
 
+// the most imprtant function, generate a quiz with provided settings
 var generate_random_question = () => {
 
     // get exam type
@@ -377,7 +380,12 @@ var generate_random_question = () => {
         }]
         amountOfAnswers--
         for (let i = 0; i < amountOfAnswers; i++) {
-            const randomBand = randomIntOneToNine()
+            // const randomBand = randomIntOneToNine()
+            // the randomBand is not too far from the key, the min max value is randomly 0 to 2 away from the key
+            let randomBand = Number(key) + (Math.floor(Math.random() * 5) - 2);
+            // if (randomBand < 1) randomBand = 1
+            // if (randomBand > 9) randomBand = 9
+            randomBand = Math.max(1, Math.min(randomBand, 9))
             const randomDescription = getRandomValueFromArray(descriptions[randomBand], pickedDescriptions)
             pickedDescriptions.push(randomDescription)
             // decide at random whether to unshift or push the new answer
