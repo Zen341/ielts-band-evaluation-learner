@@ -51,6 +51,7 @@
 
         <div class="container-fluid mx-auto my-5 p-3 border rounded d-flex flex-column gap-3 d-none"
             id="exam-form-container">
+            <div id="liveAlertPlaceholder"></div>
             <form id="exam-form">
                 <fieldset id="exam-form-fieldset">
                     <legend id="exam-form-question">Exam</legend>
@@ -170,6 +171,7 @@
         }
 
         const generateExamQuestion = () => {
+            checkNonsenseSettings()
             const questionLabel = document.getElementById('exam-form-question')
             const inputContainer = document.getElementById('exam-form-answer-inputs')
             inputContainer.innerHTML = ''
@@ -238,6 +240,21 @@
             document.getElementById("btn-next").classList.add('d-none')
             document.getElementById("btn-submit").classList.remove('d-none')
         })
+
+        // a small warning if the settings does not make sense
+        let shownedOneBandAlert = false
+        const checkNonsenseSettings = () => {
+            const settings = getPreferredSetting()
+            const examQuestionTypes = getExamQuestionType()
+            if (examQuestionTypes == "Description to Band") {
+                const settingValues = Object.values(settings)
+                const countGt0 = settingValues.filter(value => value > 0).length
+                if (countGt0 == 1 && !shownedOneBandAlert) {
+                    appendAlert('You only set 1 Band in the settings. All of the questions are only about that band', 'warning')
+                    shownedOneBandAlert = true
+                }
+            }
+        }
     </script>
 </body>
 
