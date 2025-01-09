@@ -53,7 +53,7 @@
     "background_color": "#1e2b3d",
     "theme_color": "#69c7fc",
     "orientation": "any",
-    "scope": "/",
+    "scope": ".",
     "description": "A small app to help you learn IELTS Speaking and Writing band evaluations",
     "lang": "en-US"
 }
