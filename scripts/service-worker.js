@@ -3,7 +3,6 @@ const CACHE = "cacheV1";
 
 // Select files for caching.
 let urlsToCache = [
-    "/",
     "/index.html",
     "/exam.html",
     "/settings.html",
